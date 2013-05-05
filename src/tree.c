@@ -19,7 +19,7 @@ int to_index(char c)
   case '\n': return 2;
   }
 #ifdef DEBUG
-  fprintf(stderr, "Illegal character '%c'\n", c);
+  fprintf(stderr, "ERROR: illegal character '%c'\n", c);
   exit(EXIT_FAILURE);
 #endif
   return -1;
@@ -40,5 +40,32 @@ TREE tree_delete(TREE tree)
     tree_delete(tree->sub[2]);
     free(tree);
   }
+}
+
+TREE tree_get_subtree(TREE tree, char sp)
+{
+  int i = to_index(sp);
+  if (i != -1)
+  {
+    return tree->sub[i];
+  }
+  return NULL;
+}
+
+int tree_has_action(TREE tree)
+{
+  return tree->action != NULL;
+}
+
+void tree_do_action(TREE tree)
+{
+#ifdef DEBUG
+  if (!tree->action)
+  {
+    fprintf(stderr, "ERROR: action is not set\n");
+    exit(EXIT_FAILURE);
+  }
+#endif
+  tree->action();
 }
 
