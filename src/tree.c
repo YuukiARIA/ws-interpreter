@@ -14,9 +14,9 @@ int to_index(char c)
 {
   switch (c)
   {
-  case ' ':  return 0;
-  case '\t': return 1;
-  case '\n': return 2;
+  case ' ':  case 'S': return 0;
+  case '\t': case 'T': return 1;
+  case '\n': case 'L': return 2;
   }
 #ifdef DEBUG
   fprintf(stderr, "ERROR: illegal character '%c'\n", c);
