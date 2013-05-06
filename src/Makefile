@@ -1,23 +1,23 @@
 
 
 CFLAGS = -DDEBUG
-SRCS   = main.c tree.c inst.c
-OBJS   = $(SRCS:.c=.o)
+SRCS   = main.cpp tree.cpp inst.cpp
+OBJS   = $(SRCS:.cpp=.o)
 TARGET = ws
 
 default: $(TARGET)
 
-main.o: main.c tree.h
-	gcc $(CFLAGS) -c main.c
+main.o: main.cpp tree.h
+	g++ $(CFLAGS) -c main.cpp
 
-tree.o: tree.c tree.h
-	gcc $(CFLAGS) -c tree.c
+tree.o: tree.cpp tree.h
+	g++ $(CFLAGS) -c tree.cpp
 
-inst.o: inst.c inst.h
-	gcc $(CFLAGS) -c inst.c
+inst.o: inst.cpp inst.h
+	g++ $(CFLAGS) -c inst.cpp
 
 $(TARGET): $(OBJS)
-	gcc $(OBJS) -o $(TARGET)
+	g++ $(OBJS) -o $(TARGET)
 
 .PHONY: clean
 clean:

@@ -1,11 +1,17 @@
 #ifndef TREE_H_INCLUDED
 #define TREE_H_INCLUDED
 
-typedef struct tree_t *TREE;
-typedef void (*ACTION)(void);
+class Tree
+{
+public:
+  Tree();
+  virtual ~Tree();
 
-TREE tree_new(void);
-TREE tree_delete(TREE tree);
+  Tree *operator[](char sp) const;
+
+private:
+  Tree *sub[3];
+};
 
 #endif
 

@@ -4,7 +4,7 @@
 #include "inst.h"
 #include "tree.h"
 
-static TREE g_tree;
+static Tree *g_tree;
 
 static
 char read_char(FILE *in)
@@ -56,13 +56,12 @@ void read_until_LF(FILE *in)
 
 void inst_init(void)
 {
-  g_tree = tree_new();
+  g_tree = new Tree();
 }
 
 void inst_finalize(void)
 {
-  tree_delete(g_tree);
+  delete g_tree;
   g_tree = NULL;
 }
-
 

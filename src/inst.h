@@ -25,5 +25,21 @@
 #define INST_RET        ( 22 )
 #define INST_HALT       ( 23 )
 
+class Inst
+{
+public:
+  Inst();
+
+private:
+
+  int id;
+
+  union
+  {
+    int num;
+    char *label;
+  };
+};
+
 #endif
 
