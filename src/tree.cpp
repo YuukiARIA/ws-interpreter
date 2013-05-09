@@ -50,7 +50,7 @@ void Tree::add(const char *s, int v)
   }
 }
 
-Tree *Tree::operator[](char sp) const
+Tree *Tree::get_subtree(char sp) const
 {
   int i = to_index(sp);
   if (i != -1)
@@ -58,5 +58,15 @@ Tree *Tree::operator[](char sp) const
     return sub[i];
   }
   return NULL;
+}
+
+bool Tree::is_accept() const
+{
+  return accept;
+}
+
+int Tree::get_value() const
+{
+  return value;
 }
 

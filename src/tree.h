@@ -8,8 +8,9 @@ public:
   virtual ~Tree();
 
   void add(const char *s, int v);
-
-  Tree *operator[](char sp) const;
+  Tree *get_subtree(char sp) const;
+  bool is_accept() const;
+  int get_value() const;
 
 private:
   Tree *sub[3];
