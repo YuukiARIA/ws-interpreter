@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "inst.h"
-#include "tree.h"
-
-static Tree *g_tree;
 
 static
 char read_char(FILE *in)
@@ -63,18 +60,6 @@ void read_until_LF(FILE *in)
   {
   }
 }
-
-void inst_init(void)
-{
-  g_tree = new Tree();
-}
-
-void inst_finalize(void)
-{
-  delete g_tree;
-  g_tree = NULL;
-}
-
 
 Inst::Inst(int opecode) : opecode(opecode)
 {
