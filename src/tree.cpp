@@ -31,6 +31,25 @@ Tree::~Tree()
   delete sub[2];
 }
 
+void Tree::add(const char *s, int v)
+{
+  char c = *s;
+  if (c)
+  {
+    int i = to_index(c);
+    if (!sub[i])
+    {
+      sub[i] = new Tree();
+    }
+    sub[i]->add(s + 1, v);
+  }
+  else
+  {
+    value = v;
+    accept = true;
+  }
+}
+
 Tree *Tree::operator[](char sp) const
 {
   int i = to_index(sp);

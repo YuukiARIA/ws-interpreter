@@ -7,10 +7,14 @@ public:
   Tree();
   virtual ~Tree();
 
+  void add(const char *s, int v);
+
   Tree *operator[](char sp) const;
 
 private:
   Tree *sub[3];
+  bool  accept;
+  int   value;
 };
 
 #endif
