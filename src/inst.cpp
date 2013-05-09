@@ -3,69 +3,29 @@
 #include <string.h>
 #include "inst.h"
 
-static
-char read_char(FILE *in)
+static const char *g_opcode_names[] =
 {
-  int c;
-  if ((c = fgetc(in)) == EOF)
+  "undef",
+  "push" ,  "copy" ,  "slide",  "dup"  ,  "swap" ,  "pop"  ,  "add"  ,  "sub"  ,
+  "mul"  ,  "div"  ,  "mod"  ,  "store",  "load" ,  "putc" ,  "puti" ,  "getc" ,
+  "geti" ,  "label",  "call" ,  "jmp"  ,  "jz"   ,  "jneg" ,  "ret"  ,  "halt"
+};
+
+const char *get_opcode_string(int id)
+{
+  int opcode = OPCODE(id);
+  if (opcode < 1 || 24 < opcode)
   {
-    fprintf(stderr, "Error: unexpected EOF\n");
-    exit(EXIT_FAILURE);
+    opcode = 0;
   }
-  return (char)c;
+  return g_opcode_names[opcode];
 }
 
-static
-int read_number(FILE *in)
-{
-  char c;
-  int value = 0;
-  while ((c = read_char(in)) != '\n')
-  {
-    if (c == ' ' || c == '\t')
-    {
-      value = (value << 1) | (c == '\t');
-    }
-  }
-  return value;
-}
-
-static
-int read_signed_number(FILE *in)
-{
-  int sign = 2 * (read_char(in) == ' ') - 1;
-  return sign * read_signed_number(in);
-}
-
-static
-void read_label(char *buf, FILE *in)
-{
-  char c;
-  int i = 0;
-  while ((c = read_char(in)) != '\n')
-  {
-    if (c == ' ' || c == '\t')
-    {
-      buf[i] = '0' + (c == '\t');
-    }
-  }
-  buf[i] = 0;
-}
-
-static
-void read_until_LF(FILE *in)
-{
-  char c;
-  while ((c = read_char(in)) != '\n')
-  {
-  }
-}
-
-Inst::Inst(int opecode) : opecode(opecode)
+Inst::Inst(int opcode) : opcode(opcode)
 {
 }
 
-Inst::Inst(int opecode, int operand) : opecode(opecode), operand(operand)
+Inst::Inst(int opcode, int operand) : opcode(opcode), operand(operand)
 {
 }
 
