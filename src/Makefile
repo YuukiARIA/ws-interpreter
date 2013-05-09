@@ -23,3 +23,7 @@ $(TARGET): $(OBJS)
 clean:
 	-rm -f *~ *.o
 
+.PHONY: clean_all
+clean_all: clean
+	-rm -f $(TARGET)
+
