@@ -21,11 +21,33 @@ const char *get_opcode_string(int id)
   return g_opcode_names[opcode];
 }
 
-Inst::Inst(int opcode) : opcode(opcode)
+Inst::Inst(int id) : id(id)
 {
 }
 
-Inst::Inst(int opcode, int operand) : opcode(opcode), operand(operand)
+Inst::Inst(int id, int operand) : id(id), operand(operand)
 {
+}
+
+Inst &Inst::operator= (const Inst &inst)
+{
+  id = inst.id;
+  operand = inst.operand;
+  return *this;
+}
+
+int Inst::get_id() const
+{
+  return id;
+}
+
+int Inst::get_operand() const
+{
+  return operand;
+}
+
+void Inst::set_operand(int operand)
+{
+  this->operand = operand;
 }
 

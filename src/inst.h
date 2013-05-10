@@ -39,11 +39,18 @@
 class Inst
 {
 public:
-  Inst(int opcode);
-  Inst(int opcode, int operand);
+  Inst(int id);
+  Inst(int id, int operand);
+
+  Inst &operator= (const Inst &inst);
+
+  int get_id() const;
+
+  int get_operand() const;
+  void set_operand(int operand);
 
 private:
-  int opcode;
+  int id;
   int operand;
 };
 

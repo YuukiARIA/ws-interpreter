@@ -1,8 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
 #include "tree.h"
 #include "inst.h"
+
+using namespace std;
+
+class LabelDef
+{
+public:
+  LabelDef(const std::string &str) : str(str), location(-1)
+  {
+  }
+
+  LabelDef(const LabelDef &label) : str(label.str), location(label.location)
+  {
+  }
+
+  LabelDef &operator= (const LabelDef &label)
+  {
+    str = label.str;
+    location = label.location;
+    return *this;
+  }
+
+  bool equals_str(const std::string &str) const
+  {
+    return this->str == str;
+  }
+
+  int get_location() const
+  {
+    return location;
+  }
+
+  void set_location(int location)
+  {
+    this->location = location;
+  }
+
+private:
+  std::string str;
+  int location;
+};
 
 Tree *init_tree()
 {
@@ -67,7 +111,7 @@ int read_number(FILE *in)
 int read_signed_number(FILE *in)
 {
   int sign = 2 * (read_char(in) == ' ') - 1;
-  return sign * read_signed_number(in);
+  return sign * read_number(in);
 }
 
 void read_label(char *buf, FILE *in)
@@ -78,7 +122,7 @@ void read_label(char *buf, FILE *in)
   {
     if (c == ' ' || c == '\t')
     {
-      buf[i] = '0' + (c == '\t');
+      buf[i++] = '0' + (c == '\t');
     }
   }
   buf[i] = 0;
@@ -87,6 +131,99 @@ void read_label(char *buf, FILE *in)
 void discard_until_LF(FILE *in)
 {
   while (read_char(in) != '\n');
+}
+
+int index_of_label(vector<LabelDef> &labels, const string &str)
+{
+  vector<LabelDef>::iterator itr = labels.begin();
+  for (; itr != labels.end(); ++itr)
+  {
+    const LabelDef &label = *itr;
+    if (label.equals_str(str))
+    {
+      return itr - labels.begin();
+    }
+  }
+  labels.push_back(LabelDef(str));
+  return labels.size() - 1;
+}
+
+void resolve_labels(vector<Inst> &code, const vector<LabelDef> &labels)
+{
+  for (int i = 0; i < code.size(); ++i)
+  {
+    Inst &inst = code[i];
+    if (IS_PARAM_LABEL(inst.get_id()))
+    {
+      inst.set_operand(labels[inst.get_operand()].get_location());
+    }
+  }
+}
+
+void read_input(FILE *in, const Tree *const tree)
+{
+  char label_buf[1024];
+  int c;
+  const Tree *cur = tree;
+  int pc = 0;
+
+  vector<LabelDef> labels;
+  vector<Inst> code;
+
+  while ((c = fgetc(in)) != EOF)
+  {
+    if (!is_ws(c)) continue;
+
+    cur = cur->get_subtree(c);
+    if (!cur)
+    {
+      fprintf(stderr, "Error: unknown instruction.\n");
+      fclose(in);
+      exit(EXIT_FAILURE);
+    }
+    else if (cur->is_accept())
+    {
+      int id = cur->get_value();
+      int operand = 0;
+
+      if (IS_PARAM_NUM(id))
+      {
+        operand = read_signed_number(in);
+      }
+      else if (IS_PARAM_LABEL(id))
+      {
+        read_label(label_buf, in);
+        std::string str(label_buf);
+        int index = index_of_label(labels, str);
+        operand = index;
+      }
+
+      if (id == INST_LABEL)
+      {
+        labels[operand].set_location(pc);
+      }
+      else
+      {
+        code.push_back(Inst(id, operand));
+        ++pc;
+      }
+      cur = tree;
+    }
+  }
+
+  resolve_labels(code, labels);
+
+  for (int i = 0; i < code.size(); ++i)
+  {
+    const Inst &inst = code[i];
+    int id = inst.get_id();
+    printf("%03d: %8s", i, get_opcode_string(id));
+    if (HAS_PARAM(id))
+    {
+      printf(" %d", inst.get_operand());
+    }
+    printf("\n");
+  }
 }
 
 int main(int argc, char *argv[])
@@ -108,34 +245,8 @@ int main(int argc, char *argv[])
   }
 
   Tree *root = init_tree();
-  Tree *cur = root;
-  int pc = 0;
-  while ((c = fgetc(in)) != EOF)
-  {
-    if (!is_ws(c)) continue;
 
-    cur = cur->get_subtree(c);
-    if (!cur)
-    {
-      fprintf(stderr, "Error: unknown instruction.\n");
-      fclose(in);
-      exit(EXIT_FAILURE);
-    }
-    else if (cur->is_accept())
-    {
-      int id = cur->get_value();
-      if (HAS_PARAM(id))
-      {
-        discard_until_LF(in);
-      }
-      if (id != INST_LABEL)
-      {
-        printf("%03d: %8s\n", pc, get_opcode_string(id));
-        ++pc;
-      }
-      cur = root;
-    }
-  }
+  read_input(in, root);
 
   delete root;
 
