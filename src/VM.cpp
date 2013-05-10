@@ -2,7 +2,7 @@
 #include "VM.h"
 #include "inst.h"
 
-#define ARITH(OP)    { int y = vst.pop(); int x = vst.pop(); vst.push(x OP y); }
+#define ARITH(OP)    {int y=vst.pop(); int x=vst.pop();vst.push(x OP y);}
 
 using namespace ws;
 

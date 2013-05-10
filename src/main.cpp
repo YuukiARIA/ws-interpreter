@@ -209,7 +209,7 @@ void read_input(FILE *in, const Tree *const tree)
 
   resolve_labels(code, labels);
 
-  ws::VM vm(code, 100, 100, 100);
+  ws::VM vm(code, 1024, 1024, 4096);
   vm.run();
 }
 
