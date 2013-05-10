@@ -4,41 +4,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "WSInput.h"
 #include "tree.h"
 #include "inst.h"
 #include "VM.h"
 
 using namespace std;
-
-class FilteredInput
-{
-public:
-  FilteredInput(FILE *in) : in(in) { }
-
-  int read() const
-  {
-    int c;
-    while ((c = fgetc(in)) != EOF)
-    {
-      if (c == ' ' || c == '\t' || c == '\n') break;
-    }
-    return c;
-  }
-
-  char getc() const
-  {
-    int c = read();
-    if (c == EOF)
-    {
-      fprintf(stderr, "Error: unexpected EOF.\n");
-      exit(EXIT_FAILURE);
-    }
-    return (char)c;
-  }
-
-private:
-  FILE *in;
-};
+using namespace ws;
 
 class LabelDef
 {
@@ -108,41 +80,6 @@ Tree *init_tree()
   return tree;
 }
 
-int read_number(const FilteredInput &in)
-{
-  char c;
-  int value = 0;
-  while ((c = in.getc()) != '\n')
-  {
-    if (c == ' ' || c == '\t')
-    {
-      value = (value << 1) | (c == '\t');
-    }
-  }
-  return value;
-}
-
-int read_signed_number(const FilteredInput &in)
-{
-  int sign = 2 * (in.getc() == ' ') - 1;
-  return sign * read_number(in);
-}
-
-string read_label(const FilteredInput &in)
-{
-  string s;
-  char c;
-  int i = 0;
-  while ((c = in.getc()) != '\n')
-  {
-    if (c == ' ' || c == '\t')
-    {
-      s += (char)('0' + (c == '\t'));
-    }
-  }
-  return s;
-}
-
 int index_of_label(vector<LabelDef> &labels, const string &str)
 {
   vector<LabelDef>::iterator itr = labels.begin();
@@ -170,7 +107,7 @@ void resolve_labels(vector<Inst> &code, const vector<LabelDef> &labels)
   }
 }
 
-void read_input(const FilteredInput &in, const Tree *const tree)
+void read_input(const WSInput &in, const Tree *const tree)
 {
   const Tree *cur = tree;
 
@@ -193,11 +130,11 @@ void read_input(const FilteredInput &in, const Tree *const tree)
 
       if (IS_PARAM_NUM(id))
       {
-        operand = read_signed_number(in);
+        operand = in.read_signed_number();
       }
       else if (IS_PARAM_LABEL(id))
       {
-        string labelstr = read_label(in);
+        string labelstr = in.read_label();
         operand = index_of_label(labels, labelstr);
       }
 
@@ -221,25 +158,22 @@ void read_input(const FilteredInput &in, const Tree *const tree)
 
 int main(int argc, char *argv[])
 {
-  FILE *in;
-  int c;
-
   if (argc < 2)
   {
-    fprintf(stderr, "file file file!\n");
+    fprintf(stderr, "usage: %s <File>\n", argv[0]);
     return EXIT_FAILURE;
   }
 
-  in = fopen(argv[1], "rb");
+  FILE *in = fopen(argv[1], "rb");
   if (!in)
   {
-    fprintf(stderr, "failed to open \"%s\"\n", argv[1]);
+    fprintf(stderr, "Error: failed to open \"%s\"\n", argv[1]);
     return EXIT_FAILURE;
   }
 
   Tree *root = init_tree();
 
-  read_input(FilteredInput(in), root);
+  read_input(WSInput(in), root);
 
   delete root;
 
