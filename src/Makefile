@@ -7,7 +7,7 @@ TARGET = ws
 
 default: $(TARGET)
 
-main.o: main.cpp tree.h
+main.o: main.cpp tree.h inst.h Stack.h
 	g++ $(CFLAGS) -c main.cpp
 
 tree.o: tree.cpp tree.h
