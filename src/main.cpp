@@ -119,18 +119,19 @@ int read_signed_number(FILE *in)
   return sign * read_number(in);
 }
 
-void read_label(char *buf, FILE *in)
+string read_label(FILE *in)
 {
+  string s;
   char c;
   int i = 0;
   while ((c = read_char(in)) != '\n')
   {
     if (c == ' ' || c == '\t')
     {
-      buf[i++] = '0' + (c == '\t');
+      s += (char)('0' + (c == '\t'));
     }
   }
-  buf[i] = 0;
+  return s;
 }
 
 int index_of_label(vector<LabelDef> &labels, const string &str)
@@ -162,14 +163,12 @@ void resolve_labels(vector<Inst> &code, const vector<LabelDef> &labels)
 
 void read_input(FILE *in, const Tree *const tree)
 {
-  char label_buf[1024];
-  int c;
   const Tree *cur = tree;
-  int pc = 0;
 
   vector<LabelDef> labels;
   vector<Inst> code;
 
+  int c;
   while ((c = fgetc(in)) != EOF)
   {
     if (!is_ws(c)) continue;
@@ -192,19 +191,17 @@ void read_input(FILE *in, const Tree *const tree)
       }
       else if (IS_PARAM_LABEL(id))
       {
-        read_label(label_buf, in);
-        std::string str(label_buf);
-        operand = index_of_label(labels, str);
+        string labelstr = read_label(in);
+        operand = index_of_label(labels, labelstr);
       }
 
       if (id == INST_LABEL)
       {
-        labels[operand].set_location(pc);
+        labels[operand].set_location(code.size());
       }
       else
       {
         code.push_back(Inst(id, operand));
-        ++pc;
       }
       cur = tree;
     }

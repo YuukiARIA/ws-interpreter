@@ -10,10 +10,7 @@ public:
   Heap(int size) : size(size)
   {
     p = new T[size];
-    for (int i = 0; i < size; i++)
-    {
-      p[i] = T(0);
-    }
+    for (int i = 0; i < size; ++i) p[i] = T(0);
   }
 
   virtual ~Heap()
@@ -22,6 +19,11 @@ public:
   }
 
   T &operator[] (int i)
+  {
+    return p[i];
+  }
+
+  const T &operator[] (int i) const
   {
     return p[i];
   }

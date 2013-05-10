@@ -18,13 +18,12 @@ public:
 
 private:
   std::vector<Inst> code;
-  Stack<int> *vst;
-  Stack<int> *cst;
-  Heap<int> *heap;
+  Stack<int> vst;
+  Stack<int> cst;
+  Heap<int> heap;
 
   void heap_store();
   void heap_load();
-  void arith(int (*f)(int, int));
 };
 
 } // namespace ws
