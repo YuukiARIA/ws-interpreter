@@ -1,6 +1,7 @@
 #ifndef STACK_H_INCLUDED
 #define STACK_H_INCLUDED
 
+#include <stdio.h>
 #include <stdlib.h>
 
 namespace ws {
@@ -19,7 +20,7 @@ public:
     delete [] st;
   }
 
-  void push(const T &v)
+  void push(const T v)
   {
     if (sp >= size)
     {
@@ -29,7 +30,7 @@ public:
     st[sp++] = v;
   }
 
-  T &top() const
+  T top() const
   {
     return st[sp - 1];
   }
@@ -61,37 +62,27 @@ public:
 
   void copy(int n)
   {
-    push(get(n));
+    push(st[sp - n - 1]);
   }
 
   void slide(int n)
   {
-    const T &v = pop();
+    T v = pop();
     discard(n);
     push(v);
   }
 
   void swap()
   {
-    const T &t = get(0);
-    set(0, get(1));
-    set(1, t);
+    T t = st[sp - 1];
+    st[sp - 1] = st[sp - 2];
+    st[sp - 2] = t;
   }
 
 private:
   T *st;
   int size;
   int sp;
-
-  int get(int i) const
-  {
-    return st[sp - i - 1];
-  }
-
-  void set(int i, const T &v)
-  {
-    st[sp - i - 1] = v;
-  }
 };
 
 } // namespace ws

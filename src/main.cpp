@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "tree.h"
 #include "inst.h"
+#include "VM.h"
 
 using namespace std;
 
@@ -86,7 +87,11 @@ int is_ws(char c)
 char read_char(FILE *in)
 {
   int c;
-  if ((c = fgetc(in)) == EOF)
+  while ((c = fgetc(in)) != EOF)
+  {
+    if (is_ws(c)) break;
+  }
+  if (c == EOF)
   {
     fprintf(stderr, "Error: unexpected EOF\n");
     exit(EXIT_FAILURE);
@@ -126,11 +131,6 @@ void read_label(char *buf, FILE *in)
     }
   }
   buf[i] = 0;
-}
-
-void discard_until_LF(FILE *in)
-{
-  while (read_char(in) != '\n');
 }
 
 int index_of_label(vector<LabelDef> &labels, const string &str)
@@ -194,8 +194,7 @@ void read_input(FILE *in, const Tree *const tree)
       {
         read_label(label_buf, in);
         std::string str(label_buf);
-        int index = index_of_label(labels, str);
-        operand = index;
+        operand = index_of_label(labels, str);
       }
 
       if (id == INST_LABEL)
@@ -213,17 +212,8 @@ void read_input(FILE *in, const Tree *const tree)
 
   resolve_labels(code, labels);
 
-  for (int i = 0; i < code.size(); ++i)
-  {
-    const Inst &inst = code[i];
-    int id = inst.get_id();
-    printf("%03d: %8s", i, get_opcode_string(id));
-    if (HAS_PARAM(id))
-    {
-      printf(" %d", inst.get_operand());
-    }
-    printf("\n");
-  }
+  ws::VM vm(code, 100, 100, 100);
+  vm.run();
 }
 
 int main(int argc, char *argv[])
