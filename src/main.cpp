@@ -4,12 +4,41 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include "tree.h"
 #include "inst.h"
 #include "VM.h"
 
 using namespace std;
+
+class FilteredInput
+{
+public:
+  FilteredInput(FILE *in) : in(in) { }
+
+  int read() const
+  {
+    int c;
+    while ((c = fgetc(in)) != EOF)
+    {
+      if (c == ' ' || c == '\t' || c == '\n') break;
+    }
+    return c;
+  }
+
+  char getc() const
+  {
+    int c = read();
+    if (c == EOF)
+    {
+      fprintf(stderr, "Error: unexpected EOF.\n");
+      exit(EXIT_FAILURE);
+    }
+    return (char)c;
+  }
+
+private:
+  FILE *in;
+};
 
 class LabelDef
 {
@@ -79,31 +108,11 @@ Tree *init_tree()
   return tree;
 }
 
-int is_ws(char c)
-{
-  return c == ' ' || c == '\t' || c == '\n';
-}
-
-char read_char(FILE *in)
-{
-  int c;
-  while ((c = fgetc(in)) != EOF)
-  {
-    if (is_ws(c)) break;
-  }
-  if (c == EOF)
-  {
-    fprintf(stderr, "Error: unexpected EOF\n");
-    exit(EXIT_FAILURE);
-  }
-  return (char)c;
-}
-
-int read_number(FILE *in)
+int read_number(const FilteredInput &in)
 {
   char c;
   int value = 0;
-  while ((c = read_char(in)) != '\n')
+  while ((c = in.getc()) != '\n')
   {
     if (c == ' ' || c == '\t')
     {
@@ -113,18 +122,18 @@ int read_number(FILE *in)
   return value;
 }
 
-int read_signed_number(FILE *in)
+int read_signed_number(const FilteredInput &in)
 {
-  int sign = 2 * (read_char(in) == ' ') - 1;
+  int sign = 2 * (in.getc() == ' ') - 1;
   return sign * read_number(in);
 }
 
-string read_label(FILE *in)
+string read_label(const FilteredInput &in)
 {
   string s;
   char c;
   int i = 0;
-  while ((c = read_char(in)) != '\n')
+  while ((c = in.getc()) != '\n')
   {
     if (c == ' ' || c == '\t')
     {
@@ -161,7 +170,7 @@ void resolve_labels(vector<Inst> &code, const vector<LabelDef> &labels)
   }
 }
 
-void read_input(FILE *in, const Tree *const tree)
+void read_input(const FilteredInput &in, const Tree *const tree)
 {
   const Tree *cur = tree;
 
@@ -169,15 +178,12 @@ void read_input(FILE *in, const Tree *const tree)
   vector<Inst> code;
 
   int c;
-  while ((c = fgetc(in)) != EOF)
+  while ((c = in.read()) != EOF)
   {
-    if (!is_ws(c)) continue;
-
     cur = cur->get_subtree(c);
     if (!cur)
     {
       fprintf(stderr, "Error: unknown instruction.\n");
-      fclose(in);
       exit(EXIT_FAILURE);
     }
     else if (cur->is_accept())
@@ -233,7 +239,7 @@ int main(int argc, char *argv[])
 
   Tree *root = init_tree();
 
-  read_input(in, root);
+  read_input(FilteredInput(in), root);
 
   delete root;
 

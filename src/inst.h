@@ -45,7 +45,6 @@ public:
   Inst &operator= (const Inst &inst);
 
   int get_id() const;
-
   int get_operand() const;
   void set_operand(int operand);
 

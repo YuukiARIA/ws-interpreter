@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "inst.h"
 
 static const char *g_opcode_names[] =
