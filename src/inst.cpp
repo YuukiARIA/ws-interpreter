@@ -1,5 +1,7 @@
 #include "inst.h"
 
+#ifdef ENABLE_OPCODE_STRING
+
 static const char *g_opcode_names[] =
 {
   "undef",
@@ -17,6 +19,8 @@ const char *get_opcode_string(int id)
   }
   return g_opcode_names[opcode];
 }
+
+#endif
 
 Inst::Inst(int id) : id(id)
 {

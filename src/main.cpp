@@ -45,8 +45,8 @@ Tree *init_tree()
 
 int index_of_label(vector<Label> &labels, const string &str)
 {
-  vector<Label>::iterator itr = labels.begin();
-  for (int i = 0; i < labels.size(); ++i)
+  const int n = labels.size();
+  for (int i = 0; i < n; ++i)
   {
     if (labels[i].equals_str(str))
     {
@@ -59,7 +59,8 @@ int index_of_label(vector<Label> &labels, const string &str)
 
 void resolve_labels(vector<Inst> &code, const vector<Label> &labels)
 {
-  for (int i = 0; i < code.size(); ++i)
+  const int n = code.size();
+  for (int i = 0; i < n; ++i)
   {
     Inst &inst = code[i];
     if (IS_PARAM_LABEL(inst.get_id()))
@@ -114,7 +115,7 @@ void read_input(const WSInput &in, const Tree *const tree)
 
   resolve_labels(code, labels);
 
-  ws::VM vm(code, 1024, 1024, 4096);
+  VM vm(code, 1024, 1024, 4096);
   vm.run();
 }
 

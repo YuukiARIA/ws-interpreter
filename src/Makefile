@@ -1,6 +1,6 @@
 
 
-CFLAGS = -DDEBUG
+CFLAGS = -DDEBUG -Wall
 SRCS   = main.cpp tree.cpp inst.cpp VM.cpp
 OBJS   = $(SRCS:.cpp=.o)
 TARGET = ws

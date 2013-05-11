@@ -29,11 +29,12 @@ VM::~VM()
 
 void VM::run()
 {
+  const int length = code.size();
   int pc = 0;
 
   while (1)
   {
-    if (pc >= code.size())
+    if (pc >= length)
     {
       fprintf(stderr, "Error: out of bounds.\n");
       break;

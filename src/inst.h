@@ -53,7 +53,9 @@ private:
   int operand;
 };
 
+#ifdef ENABLE_OPCODE_STRING
 const char *get_opcode_string(int id);
+#endif
 
 #endif
 
