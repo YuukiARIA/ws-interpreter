@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Label.h"
 #include "WSInput.h"
 #include "tree.h"
 #include "inst.h"
@@ -11,44 +12,6 @@
 
 using namespace std;
 using namespace ws;
-
-class LabelDef
-{
-public:
-  LabelDef(const std::string &str) : str(str), location(-1)
-  {
-  }
-
-  LabelDef(const LabelDef &label) : str(label.str), location(label.location)
-  {
-  }
-
-  LabelDef &operator= (const LabelDef &label)
-  {
-    str = label.str;
-    location = label.location;
-    return *this;
-  }
-
-  bool equals_str(const std::string &str) const
-  {
-    return this->str == str;
-  }
-
-  int get_location() const
-  {
-    return location;
-  }
-
-  void set_location(int location)
-  {
-    this->location = location;
-  }
-
-private:
-  std::string str;
-  int location;
-};
 
 Tree *init_tree()
 {
@@ -80,22 +43,21 @@ Tree *init_tree()
   return tree;
 }
 
-int index_of_label(vector<LabelDef> &labels, const string &str)
+int index_of_label(vector<Label> &labels, const string &str)
 {
-  vector<LabelDef>::iterator itr = labels.begin();
-  for (; itr != labels.end(); ++itr)
+  vector<Label>::iterator itr = labels.begin();
+  for (int i = 0; i < labels.size(); ++i)
   {
-    const LabelDef &label = *itr;
-    if (label.equals_str(str))
+    if (labels[i].equals_str(str))
     {
-      return itr - labels.begin();
+      return i;
     }
   }
-  labels.push_back(LabelDef(str));
+  labels.push_back(Label(str));
   return labels.size() - 1;
 }
 
-void resolve_labels(vector<Inst> &code, const vector<LabelDef> &labels)
+void resolve_labels(vector<Inst> &code, const vector<Label> &labels)
 {
   for (int i = 0; i < code.size(); ++i)
   {
@@ -111,7 +73,7 @@ void read_input(const WSInput &in, const Tree *const tree)
 {
   const Tree *cur = tree;
 
-  vector<LabelDef> labels;
+  vector<Label> labels;
   vector<Inst> code;
 
   int c;

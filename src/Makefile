@@ -7,7 +7,7 @@ TARGET = ws
 
 default: $(TARGET)
 
-main.o: main.cpp WSInput.h tree.h inst.h VM.h
+main.o: main.cpp Label.h WSInput.h tree.h inst.h VM.h
 	g++ $(CFLAGS) -c main.cpp
 
 tree.o: tree.cpp tree.h
