@@ -20,6 +20,11 @@ public:
     delete [] st;
   }
 
+  void clear()
+  {
+    sp = 0;
+  }
+
   void push(const T v)
   {
     if (sp >= size)

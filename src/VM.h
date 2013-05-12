@@ -14,6 +14,7 @@ public:
   VM(std::vector<Inst> code, int vst_size, int cst_size, int heap_size);
   virtual ~VM();
 
+  void reset();
   void run();
 
 private:
@@ -21,6 +22,7 @@ private:
   Stack<int> vst;
   Stack<int> cst;
   Heap<int> heap;
+  int pc;
 
   void heap_store();
   void heap_load();

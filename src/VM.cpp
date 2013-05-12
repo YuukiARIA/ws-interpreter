@@ -27,11 +27,18 @@ VM::~VM()
 {
 }
 
+void VM::reset()
+{
+  pc = 0;
+  vst.clear();
+  cst.clear();
+}
+
 void VM::run()
 {
   const int length = code.size();
-  int pc = 0;
 
+  reset();
   while (1)
   {
     if (pc >= length)
@@ -46,23 +53,23 @@ void VM::run()
 
     switch (inst.get_id())
     {
-    case INST_PUSH:    vst.push(inst.get_operand()); break;
-    case INST_COPY:    vst.copy(inst.get_operand()); break;
+    case INST_PUSH:    vst.push(inst.get_operand());  break;
+    case INST_COPY:    vst.copy(inst.get_operand());  break;
     case INST_SLIDE:   vst.slide(inst.get_operand()); break;
-    case INST_DUP:     vst.dup(); break;
-    case INST_SWAP:    vst.swap(); break;
-    case INST_POP:     vst.pop(); break;
-    case INST_ADD:     ARITH(+); break;
-    case INST_SUB:     ARITH(-); break;
-    case INST_MUL:     ARITH(*); break;
-    case INST_DIV:     ARITH(/); break;
-    case INST_MOD:     ARITH(%); break;
-    case INST_STORE:   heap_store(); break;
-    case INST_LOAD:    heap_load(); break;
-    case INST_PUTC:    putchar((char)vst.pop()); break;
-    case INST_PUTI:    printf("%d", vst.pop()); break;
-    case INST_GETC:    heap[vst.pop()] = getchar(); break;
-    case INST_GETI:    heap[vst.pop()] = geti(); break;
+    case INST_DUP:     vst.dup();                     break;
+    case INST_SWAP:    vst.swap();                    break;
+    case INST_POP:     vst.pop();                     break;
+    case INST_ADD:     ARITH(+);                      break;
+    case INST_SUB:     ARITH(-);                      break;
+    case INST_MUL:     ARITH(*);                      break;
+    case INST_DIV:     ARITH(/);                      break;
+    case INST_MOD:     ARITH(%);                      break;
+    case INST_STORE:   heap_store();                  break;
+    case INST_LOAD:    heap_load();                   break;
+    case INST_PUTC:    putchar((char)vst.pop());      break;
+    case INST_PUTI:    printf("%d", vst.pop());       break;
+    case INST_GETC:    heap[vst.pop()] = getchar();   break;
+    case INST_GETI:    heap[vst.pop()] = geti();      break;
     case INST_CALL:
       cst.push(pc);
     case INST_JMP:
