@@ -3,6 +3,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include "RuntimeException.h"
 #include "Label.h"
 #include "WSInput.h"
 #include "tree.h"
@@ -11,6 +12,7 @@
 
 using namespace std;
 using namespace ws;
+using namespace ws::exception;
 
 Tree *init_tree()
 {
@@ -114,8 +116,15 @@ void read_input(const WSInput &in, const Tree *const tree)
 
   resolve_labels(code, labels);
 
-  VM vm(code, 1024, 1024, 4096);
-  vm.run();
+  VM vm(code, 1024, 1024, 1);
+  try
+  {
+    vm.run();
+  }
+  catch (RuntimeException &e)
+  {
+    fprintf(stderr, "Error: %s\n", e.get_message());
+  }
 }
 
 int main(int argc, char *argv[])

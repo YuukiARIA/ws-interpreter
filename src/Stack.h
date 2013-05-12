@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "RuntimeException.h"
 
 namespace ws {
 
@@ -25,12 +26,11 @@ public:
     sp = 0;
   }
 
-  void push(const T v)
+  void push(const T v) throw(exception::RuntimeException)
   {
     if (sp >= size)
     {
-      fprintf(stderr, "Error: can't push.\n");
-      exit(EXIT_FAILURE);
+      throw exception::RuntimeException("can't push.");
     }
     st[sp++] = v;
   }
@@ -40,22 +40,20 @@ public:
     return st[sp - 1];
   }
 
-  T pop()
+  T pop() throw(exception::RuntimeException)
   {
     if (sp <= 0)
     {
-      fprintf(stderr, "Error: can't pop.\n");
-      exit(EXIT_FAILURE);
+      throw exception::RuntimeException("can't pop.");
     }
     return st[--sp];
   }
 
-  void discard(int n)
+  void discard(int n) throw(exception::RuntimeException)
   {
     if (sp < n)
     {
-      fprintf(stderr, "Error: can't discard.\n");
-      exit(EXIT_FAILURE);
+      throw exception::RuntimeException("can't discard.");
     }
     sp -= n;
   }
