@@ -58,7 +58,7 @@ int index_of_label(vector<Label> &labels, const string &str)
   return labels.size() - 1;
 }
 
-void resolve_labels(vector<Inst> &code, const vector<Label> &labels)
+bool resolve_labels(vector<Inst> &code, const vector<Label> &labels)
 {
   const int n = code.size();
   for (int i = 0; i < n; ++i)
@@ -66,17 +66,23 @@ void resolve_labels(vector<Inst> &code, const vector<Label> &labels)
     Inst &inst = code[i];
     if (IS_PARAM_LABEL(inst.get_id()))
     {
-      inst.set_operand(labels[inst.get_operand()].get_location());
+      int location = labels[inst.get_operand()].get_location();
+      if (location == -1)
+      {
+        fprintf(stderr, "Error: undefined label.\n");
+        return false;
+      }
+      inst.set_operand(location);
     }
   }
+  return true;
 }
 
-void read_input(const WSInput &in, const Tree *const tree)
+bool read_input(vector<Inst> &code, const WSInput &in, const Tree *const tree)
 {
   const Tree *cur = tree;
 
   vector<Label> labels;
-  vector<Inst> code;
 
   int c;
   while ((c = in.read()) != EOF)
@@ -85,7 +91,7 @@ void read_input(const WSInput &in, const Tree *const tree)
     if (!cur)
     {
       fprintf(stderr, "Error: unknown instruction.\n");
-      exit(EXIT_FAILURE);
+      return false;
     }
     else if (cur->is_accept())
     {
@@ -114,17 +120,7 @@ void read_input(const WSInput &in, const Tree *const tree)
     }
   }
 
-  resolve_labels(code, labels);
-
-  VM vm(code, 1024, 1024, 1);
-  try
-  {
-    vm.run();
-  }
-  catch (RuntimeException &e)
-  {
-    fprintf(stderr, "Error: %s\n", e.get_message());
-  }
+  return resolve_labels(code, labels);
 }
 
 int main(int argc, char *argv[])
@@ -144,11 +140,27 @@ int main(int argc, char *argv[])
 
   Tree *root = init_tree();
 
-  read_input(WSInput(in), root);
+  vector<Inst> code;
+  bool success = read_input(code, WSInput(in), root);
 
   delete root;
-
   fclose(in);
+
+  if (!success)
+  {
+    return EXIT_FAILURE;
+  }
+
+  VM vm(code, 1024, 1024, 4096);
+  try
+  {
+    vm.run();
+  }
+  catch (RuntimeException &e)
+  {
+    fprintf(stderr, "Error: %s\n", e.get_message());
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }
