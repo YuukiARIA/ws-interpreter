@@ -131,7 +131,62 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  FILE *in = fopen(argv[1], "rb");
+  char *input_file = NULL;
+  int vst_size = 256;
+  int cst_size = 256;
+  int heap_size = 2048;
+
+  for (int i = 1; i < argc; ++i)
+  {
+    char *arg = argv[i];
+    if (arg[0] == '-' && strlen(arg) == 2)
+    {
+       switch (arg[1])
+       {
+       case 'v':
+         if (i + 1 >= argc)
+         {
+           fprintf(stderr, "Error: no argument with option '-v'\n");
+           return EXIT_FAILURE;
+         }
+         vst_size = atoi(argv[++i]);
+         break;
+       case 'c':
+         if (i + 1 >= argc)
+         {
+           fprintf(stderr, "Error: no argument with option '-c'\n");
+           return EXIT_FAILURE;
+         }
+         cst_size = atoi(argv[++i]);
+         break;
+       case 'h':
+         if (i + 1 >= argc)
+         {
+           fprintf(stderr, "Error: no argument with option '-h'\n");
+           return EXIT_FAILURE;
+         }
+         heap_size = atoi(argv[++i]);
+         break;
+       }
+    }
+    else if (!input_file)
+    {
+      input_file = arg;
+    }
+  }
+
+  if (!input_file)
+  {
+    fprintf(stderr, "Error: no input file.\n");
+    return EXIT_FAILURE;
+  }
+  if (vst_size <= 0 || cst_size <= 0 || heap_size <= 0)
+  {
+    fprintf(stderr, "Error: memory size must be positive.\n");
+    return EXIT_FAILURE;
+  }
+
+  FILE *in = fopen(input_file, "rb");
   if (!in)
   {
     fprintf(stderr, "Error: failed to open \"%s\"\n", argv[1]);
@@ -151,7 +206,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  VM vm(code, 1024, 1024, 4096);
+  VM vm(code, vst_size, cst_size, heap_size);
   try
   {
     vm.run();
